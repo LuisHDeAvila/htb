@@ -1,0 +1,104 @@
+#!/bin/bash
+# by: eleAche
+# Make the workspace for htb machines
+clear
+
+# custom prompt for this script
+printstyle(){
+  echo -e "\e[3;30;48m${@}\e[m"
+}
+
+printstyle "[!] Markov: This script make workspace for h4ck1ng sessions\nby: eleAche\t\t lets go!!\n\n"
+read -p "what is the name of machine? ->  " VICTIM_NAME
+read -p "what is the ip of the machine? ->  " VICTIM_IP
+
+printstyle "\n\n[!] Markov: try to connect..."
+
+# if conection is not stablished, break
+until ping -c 1 ${VICTIM_IP} >/dev/null
+    do	
+	echo "[X] The machine is not avalible, please check the ip address of machine on virtual private network (run the command 'ip a' and identify the tunnel parameters)"
+	exit 0
+done
+
+# if all is done initialize the workspace
+
+# make workspace
+	makeworkspace(){
+    local workspace=~/.machines/${VICTIM_NAME}
+  [[ -e $workspace ]] || mkdir $workspace
+  cd $workspace
+  printstyle "[!] Markov: workspace was created!"
+  sleep 1s
+}
+
+# make reporting script
+	makescript(){
+  cat << 'EOF' | sed 's/IPADDRESS/'${VICTIM_IP}'/g' > machine
+#!/bin/bash
+IP=IPADDRESS
+
+HELP(){
+cat << 'HELP'
+This is an log utility and execution purposes.
+example:
+  ./machine ping # execute ping over IP machine
+  ./machine whatweb # execute whatweb over IP machine
+and stdout show normally, but stdin is agree to file.
+
+For execution commands for http://<IP>:<PORT>/<PATH>
+  -p    PORT
+  -u    PATH URL
+HELP
+}
+while getopts h:p:u: option
+  do
+    case $option in
+      p)
+        PORT="$OPTARG"
+        TARGET="http://${IP}:${PORT}"
+      ;;
+      u)
+        URI="$OPTARG"
+        TARGET="http://${IP}:${PORT}/$URI"
+      ;;
+      h)
+        HELP
+      ;;
+      esac
+  done
+
+shift $(( OPTIND - 1 ));
+
+echo "# $@" >> $0
+{
+	"$@" $IP
+}
+
+# commands
+EOF
+  chmod +x machine
+  printstyle "[!] Markov: reporting script was created!"
+  sleep 1s
+}
+
+# make shortcut for easy access to workspace
+	makeshortcut(){
+    local scmachine=~/.myscripts/htb
+  rm $scmachine
+  echo -e '#!/bin/bash\n' > $scmachine
+  echo "cd ~/.machines/${VICTIM_NAME}" >> $scmachine
+  chmod +x $scmachine
+  printstyle "[!] Markov: command [ htb ] was created!"
+  sleep 1s
+}
+
+makeworkspace
+makescript
+makeshortcut
+
+htb
+printstyle "[!] Markov: the workspace to attack machine was created, run the ./machine [COMMANDS], for automatic attack the machine ${VICTIM_NAME^^}:${VICTIM_IP} and run [ htb ] command for easy access for machine directory\n[!] Markov: initial scan for ${VICTIM_NAME} is running, plase wait few minuts\n"
+
+./machine nmap -sC -sV -p- --min-rate 5000 -vvv > nmap-${VICTIM_NAME}.txt && cat nmap-${VICTIM_NAME}.txt
+echo "       --==[remmember: HACK THE WORLD]==--   "
