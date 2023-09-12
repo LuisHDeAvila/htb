@@ -26,7 +26,7 @@ done
 # make workspace
 	makeworkspace(){
     local workspace=~/.machines/${VICTIM_NAME}
-  [[ -e $workspace ]] || mkdir $workspace
+  [[ -e $workspace ]] || mkdir -p $workspace
   cd $workspace
   printstyle "[!] Markov: workspace was created!"
   sleep 1s
@@ -98,10 +98,14 @@ EOF
 
 # make shortcut for easy access to workspace
 	makeshortcut(){
+    until ls ~/.myscripts
+	do
+	  mkdir ~/.myscripts
+      done
     local scmachine=~/.myscripts/htb
-  rm $scmachine
-  echo -e '#!/bin/bash\n' > $scmachine
-  echo "cd ~/.machines/${VICTIM_NAME}" >> $scmachine
+  echo "" > $scmachine
+  echo '#!/bin/bash' > $scmachine
+  echo -e "\ncd ~/.machines/${VICTIM_NAME}" >> $scmachine
   chmod +x $scmachine
   printstyle "[!] Markov: command [ htb ] was created!"
   sleep 1s
@@ -111,7 +115,7 @@ makeworkspace
 makescript
 makeshortcut
 
-htb
+cd "~/.machines/${VICTIM_NAME}"
 printstyle "[!] Markov: the workspace to attack machine was created, run the ./machine [COMMANDS], for automatic attack the machine ${VICTIM_NAME^^}:${VICTIM_IP} and run [ htb ] command for easy access for machine directory\n[!] Markov: initial scan for ${VICTIM_NAME} is running, plase wait few minuts\n"
 
 ./machine nmap -sC -sV -p- --min-rate 5000 -vvv > nmap-${VICTIM_NAME}.txt && cat nmap-${VICTIM_NAME}.txt
