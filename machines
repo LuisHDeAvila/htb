@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # by: eleAche
 # Make the workspace for htb machines
 clear
@@ -38,7 +38,7 @@ done
 #!/bin/bash
 IP=IPADDRESS
 
-HELP(){
+help_function(){
 cat << 'HELP'
 This is an log utility and execution purposes.
 example:
@@ -46,33 +46,47 @@ example:
   ./machine whatweb # execute whatweb over IP machine
 and stdout show normally, but stdin is agree to file.
 
-For execution commands for http://<IP>:<PORT>/<PATH>
+For execution commands for <PROTOCOL>://<IP>:<PORT>/<PATH>
   -p    PORT
   -u    PATH URL
+  -t	PROTOCOL
+  -h	help
+
+Example:
+  ./machine -p 8080 -u login -t https curl -v
+  # is the same:
+  # curl -v https://IP_MACHINE:8080/login
+
 HELP
 }
-while getopts h:p:u: option
+
+URI=""
+PORT=""
+PROTOCOL=""
+
+while getopts p:u:t:h option
   do
     case $option in
       p)
-        PORT="$OPTARG"
-        TARGET="http://${IP}:${PORT}"
+        PORT=":$OPTARG"
       ;;
       u)
-        URI="$OPTARG"
-        TARGET="http://${IP}:${PORT}/$URI"
+        URI="/$OPTARG"
+      ;;
+      t)
+      	PROTOCOL="$OPTARG://"
       ;;
       h)
-        HELP
+        help_function
+        exit
       ;;
       esac
   done
-
 shift $(( OPTIND - 1 ));
 
 echo "# $@" >> $0
 {
-	"$@" $IP
+	"$@" $PROTOCOL$IP$PORT$URI
 }
 
 # commands
