@@ -54,7 +54,7 @@ python3 -m http.server
 To download it to our local machine we use:
 ```
 # local machine
-wget IP_MACHINE/cloudhosting-0.0.1.jar
+wget IP_MACHINE:8000/cloudhosting-0.0.1.jar
 ```
 ## Reading the database
 To reverse engineer the file we obtained, we opened [ jd-gui > Openfile > cloudhosting-0.0.1.jar ]. and we head to BOOT-INF/classes/application.properties where we will find the postgres database configurations:
