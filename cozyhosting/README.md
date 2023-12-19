@@ -6,7 +6,7 @@ IP_MACHINE: ip of cozyhosting
   nmap -sC -sV -p- --min-rate 5000 IP_MACHINE
 ```
 add the domain cozyhosting.htb to the /etc/hosts file and open [ Burpsuite > Proxy > Open Browser ] navigate to route cozyhosting.htb/login. And do a login test with the credentials test:test
-### Cookie Hijacking
+## Cookie Hijacking
 open the [ Developer Tools > Application > Cookies > http://cozyhosting.htb/ ]. Where we can see a cookie that has been generated when trying to log in
 ```
 JSESSIONID:VALUE
@@ -56,7 +56,7 @@ To download it to our local machine we use:
 # local machine
 wget IP_MACHINE/cloudhosting-0.0.1.jar
 ```
-## Exploiting the database
+## Reading the database
 To reverse engineer the file we obtained, we opened [ jd-gui > Openfile > cloudhosting-0.0.1.jar ]. and we head to BOOT-INF/classes/application.properties where we will find the postgres database configurations:
 ```
 # AN_PASSWORD: is the database password
@@ -79,7 +79,7 @@ Within the database we execute the following commands to obtain the authenticati
 \d
 SELECT * FROM users;
 ```
-## breaking hashes (cryptography)
+## Breaking hashes (cryptography)
 which would look like this:
 ```
 # HASHONE: is a hash of 61 characters
